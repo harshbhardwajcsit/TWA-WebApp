@@ -12,6 +12,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 // // public middleware for front-end
 app.use(express.static("public"));
+
+var csv;
   //collecting Agg.api data
 app.get("/set",function (req,res) {
     console.log("Aggregation api call");
@@ -28,20 +30,21 @@ app.get("/set",function (req,res) {
         if (error) {
             console.log("NO error");
         } else {
-            console.log(body);
+            //console.log(body);
             var lines = body.split('\n')
             lines.splice(1,1);
             var newcsv=lines.join('\n');
+            csv=newcsv;
             console.log(newcsv);
         }
     }
-
+console.log(csv);
 
 
 
 })
 //deployment on server
-var port=process.env.PORT || 3006;
+var port=process.env.PORT || 3007;
 app.listen(port,function (req,res) {
     console.log("server started");
 
