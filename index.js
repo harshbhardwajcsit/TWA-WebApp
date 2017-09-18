@@ -2,6 +2,8 @@
 //libraries include
 var express=require('express');
 var fs = require('fs');
+var util = require('util');
+
 var FormData = require('form-data');
 var getLine = require('get-line');
 var bodyParser = require("body-parser");
@@ -48,8 +50,6 @@ app.get("/set",function (req,res) {
         }
 
     }
-
-
 });
 
 
@@ -112,40 +112,27 @@ app.get("/data",function (req,res) {
     });
 
 
-    var form = new FormData();
-    form.append('file',newcsv);
-    request.post({
-        headers: {
-            'Accept': 'application/json',
-            'neuron-application-id': '63aa7e3d040c3aa3eca58680ff5330a661628f2a',
-            'neuron-application-key': '9'
-        },
-        body:form,
-        url: 'http://34.233.93.143/1.0/datasets/PLMS_d/data',
-    }, function(error, response, body){
-        console.log(body);
-        res.send(body);
-
-    });
-
-
-
-
 });
 
 
 
 app.get("/upload",function (req,res) {
     console.log("uploading dataset...");
+    //fs.writeFileSync('./file.csv', util.inspect(newcsv) , 'utf-8');
+
+
     var form = new FormData();
-    form.append('file',newcsv);
+    form.append('file','new.csv');
     request.post({
         headers: {
             'Accept': 'application/json',
             'neuron-application-id': '63aa7e3d040c3aa3eca58680ff5330a661628f2a',
             'neuron-application-key': '9'
         },
-        body:form,
+        body:{'Content-Disposition': 'form-data',
+              'name':'file',
+              'filename':newcsv,
+              'Content-Type':'text/csv'},
         url: 'http://34.233.93.143/1.0/datasets/PLMS_d/data',
     }, function(error, response, body){
         console.log(body);
@@ -158,7 +145,7 @@ app.get("/upload",function (req,res) {
 
 
 //deployment on server
-var port=process.env.PORT || 3005;
+var port=process.env.PORT || 3031;
 app.listen(port,function (req,res) {
     console.log("server started");
 
