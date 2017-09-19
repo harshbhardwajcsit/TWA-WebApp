@@ -5,6 +5,7 @@ var fs = require('fs');
 var util = require('util');
 var CSV = require('csv-string');
 var jsonparser = require('jsonparser');
+var http = require("http");
 
 var FormData = require('form-data');
 var getLine = require('get-line');
@@ -24,7 +25,7 @@ global.newcsv;
 
   //collecting Agg.api data
 app.get("/set",function (req,res) {
-    console.log("Aggregation api call");
+    console.log("getting aggregated data from LRS.....");
     res.send("Aggregation Api flow");
 
 
@@ -94,28 +95,28 @@ app.get("/data",function (req,res) {
 
 
 app.get("/upload",function (req,res) {
-    console.log("uploading dataset...");
-    fs.writeFileSync('./file.csv', util.inspect(newcsv) , 'utf-8');
-
-
-    var form = new FormData();
-    form.append('file','file.csv');
-    request.post({
-        headers: {
-            'Accept': 'application/json',
-            'neuron-application-id': '63aa7e3d040c3aa3eca58680ff5330a661628f2a',
-            'neuron-application-key': '9'
-        },
-        body:form,
+    console.log("uploading dataset...please wait");
+    var options = { method: 'POST',
         url: 'http://34.233.93.143/1.0/datasets/PLMS_d/data',
-    }, function(error, response, body){
-        console.log(body);
-        res.send(body);
+        headers:
+            {
+                'neuron-application-key': '9',
+                'neuron-application-id': '63aa7e3d040c3aa3eca58680ff5330a661628f2a',
+                'accept': 'application/json',
+                'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' },
+        formData:
+            { file:
+                { value: fs.createReadStream("printer_demo_data.csv"),
+                    options: { filename: 'printer_demo_data.csv', contentType: null } } } };
 
+    request(options, function (error, response, body) {
+        if (error) throw new Error(error);
+
+        console.log(body);
     });
 
-});
 
+});
 
 
 
